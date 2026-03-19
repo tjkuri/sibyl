@@ -1,0 +1,29 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "sibyl"
+version = "0.1.0"
+description = "Algo trading platform for US stocks/ETFs via Alpaca"
+requires-python = ">=3.10"
+dependencies = [
+    "alpaca-py",
+    "pytz",
+    "pandas",
+    "numpy",
+    "pydantic-settings",
+    "python-dotenv",
+    "pyarrow",
+    "matplotlib",
+    "tabulate",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest",
+    "pytest-asyncio",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src"]
