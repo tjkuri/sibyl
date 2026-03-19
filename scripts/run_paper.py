@@ -20,13 +20,22 @@ from src.engine import StrategyEngine
 from src.orders.manager import OrderManager
 from src.portfolio.manager import PortfolioManager
 from src.portfolio.reporter import PortfolioReporter
+from datetime import timedelta
+
 from src.strategies.buy_and_hold import BuyAndHoldStrategy
+from src.strategies.ma_crossover import MovingAverageCrossoverStrategy
+from src.strategies.rsi import RSIStrategy
 
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Run paper/live trading")
     parser.add_argument("--symbols", nargs="+", required=True, help="Symbols to trade")
-    parser.add_argument("--qty", type=float, default=1.0, help="Shares per symbol")
+    parser.add_argument(
+        "--strategy",
+        choices=["buy_and_hold", "ma_crossover", "rsi"],
+        default="buy_and_hold",
+        help="Strategy to run (default: buy_and_hold)",
+    )
     parser.add_argument("--log-level", default="INFO", help="Logging level")
     return parser.parse_args()
 
@@ -66,7 +75,18 @@ async def main() -> None:
     order_manager = OrderManager(client)
     engine = StrategyEngine(data=data, portfolio=portfolio)
 
-    strategy = BuyAndHoldStrategy(args.symbols, qty_per_symbol=args.qty)
+    if args.strategy == "ma_crossover":
+        warmup_start = (datetime.now() - timedelta(days=100)).strftime("%Y-%m-%d")
+        warmup_end = datetime.now().strftime("%Y-%m-%d")
+        strategy = MovingAverageCrossoverStrategy(
+            args.symbols,
+            warmup_start=warmup_start,
+            warmup_end=warmup_end,
+        )
+    elif args.strategy == "rsi":
+        strategy = RSIStrategy(args.symbols)
+    else:
+        strategy = BuyAndHoldStrategy(args.symbols)
     engine.register_strategy(strategy)
 
     await engine.initialize()

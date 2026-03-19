@@ -104,10 +104,12 @@ python scripts/run_backtest.py --symbols AAPL SPY QQQ --start 2022-01-01 --end 2
 ### Paper trading
 
 ```bash
-python scripts/run_paper.py --symbols AAPL SPY --qty 1
+python scripts/run_paper.py --symbols AAPL SPY
+python scripts/run_paper.py --symbols SPY --strategy rsi
+python scripts/run_paper.py --symbols SPY --strategy ma_crossover
 ```
 
-Requires a valid `.env` with paper trading keys.
+Accepts the same `--strategy` flag as the backtest. For `ma_crossover`, warmup bars are fetched automatically from Alpaca's REST API — no local data file needed. Requires a valid `.env` with paper trading keys. Bars only stream during market hours (9:30am–4pm ET).
 
 ---
 
